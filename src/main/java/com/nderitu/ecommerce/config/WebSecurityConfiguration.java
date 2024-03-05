@@ -33,36 +33,10 @@ public class WebSecurityConfiguration {
         * access protected resources */
         //todo configure with spring 3.0.0
 
-
-
-               /* .csrf()
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // If CSRF protection is needed
-                 // Or omit this block if disabling CSRF
-                .authorizeRequests()
-                .requestMatchers("/authenticate", "/sign-up", "/order/**")
-                .permitAll()
-                .and()
-                .securityMatcher("/api/**")
-                .authenticated()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.NEVER) // For stateless configuration
-                .addFilterAt(authFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();*/
-        return http    .csrf()/* Cross-Site Request Forgery(a type of website attack) where a malicious
+        return http    .csrf(AbstractHttpConfigurer::disable)/* Cross-Site Request Forgery(a type of website attack) where a malicious
                     website tricks a browser to make an unintended HTTP request to another site where
                     the user is authenticated*/
-                .disable()
-                .authorizeHttpRequests()
-                .requestMatchers("/authenticate", "/sign-up", "/order/**")
-                .permitAll()
-                .and()
-                .authorizeHttpRequests()
-                .requestMatchers("/api/**")
-                .authenticated()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+                .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
 

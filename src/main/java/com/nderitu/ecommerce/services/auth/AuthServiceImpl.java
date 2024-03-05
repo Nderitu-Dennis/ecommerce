@@ -2,8 +2,11 @@ package com.nderitu.ecommerce.services.auth;
 
 import com.nderitu.ecommerce.dto.SignupRequest;
 import com.nderitu.ecommerce.dto.UserDto;
+import com.nderitu.ecommerce.entity.Order;
 import com.nderitu.ecommerce.entity.User;
+import com.nderitu.ecommerce.enums.OrderStatus;
 import com.nderitu.ecommerce.enums.UserRole;
+import com.nderitu.ecommerce.repository.OrderRepository;
 import com.nderitu.ecommerce.repository.UserRepository;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,9 @@ public class AuthServiceImpl implements AuthService{
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    @Autowired
+    private OrderRepository orderRepository;
+
     public UserDto createUser(SignupRequest signupRequest) {
         //create a new user
         User user = new User();
@@ -30,6 +36,14 @@ public class AuthServiceImpl implements AuthService{
         user.setPassword(new BCryptPasswordEncoder().encode(signupRequest.getPassword())); //encode the password first
         user.setRole(UserRole.CUSTOMER);
         User createdUser = userRepository.save(user); //save the new user into the DB
+
+        Order order =new Order();
+        order.setAmount(0L);
+        order.setTotalAmount(0L);
+        order.setDiscount(0L);
+        order.setUser(createdUser);
+        order.setOrderStatus(OrderStatus.Pending);
+        orderRepository.save(order);
 
         UserDto userDto = new UserDto();
         userDto.setId(createdUser.getId());  //setting id for the created user
