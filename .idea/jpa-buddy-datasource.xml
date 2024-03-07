@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="JpbDataSourceConfig">
+    <data-sources>
+      <data-source id="f33df760-f26b-426b-8334-4b7fa520d848" name="ecommerce" url="jdbc:postgresql://localhost/ecommerce" driverClass="org.postgresql.Driver" />
+    </data-sources>
     <data-source-infos>
       <data-source-info id="" persistence-unit-name="Default" />
     </data-source-infos>

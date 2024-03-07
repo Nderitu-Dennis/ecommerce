@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+
 @Service
 
 public class AuthServiceImpl implements AuthService{
@@ -38,9 +40,12 @@ public class AuthServiceImpl implements AuthService{
         User createdUser = userRepository.save(user); //save the new user into the DB
 
         Order order =new Order();
-        order.setAmount(0L);
+       /* order.setAmount(0L);
         order.setTotalAmount(0L);
-        order.setDiscount(0L);
+        order.setDiscount(0L);*/
+        order.setAmount(BigDecimal.ZERO);
+        order.setTotalAmount(BigDecimal.ZERO);
+        order.setDiscount(BigDecimal.ZERO);
         order.setUser(createdUser);
         order.setOrderStatus(OrderStatus.Pending);
         orderRepository.save(order);

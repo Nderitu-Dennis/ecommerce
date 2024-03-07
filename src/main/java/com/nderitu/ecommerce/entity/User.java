@@ -1,3 +1,4 @@
+/*
 package com.nderitu.ecommerce.entity;
 
 import com.nderitu.ecommerce.enums.UserRole;
@@ -22,7 +23,6 @@ public class User {
     private UserRole role;
 
     @Lob     //fields that store large amount of binary/character data
-   @Column(columnDefinition = "bytea")
    private byte[] image;
 
     public User() {
@@ -31,4 +31,37 @@ public class User {
    public User(byte[] image) {
        this.image = image; }
 
+}
+*/
+
+package com.nderitu.ecommerce.entity;
+
+import com.nderitu.ecommerce.enums.UserRole;
+import jakarta.persistence.*;
+import lombok.Data;
+
+@Entity
+@Table(name = "users")
+@Data
+public class User {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String email;
+
+    private String password;
+
+    private String name;
+
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
+
+    @Lob
+    private byte[] image;
+
+    // Default constructor provided by Lombok's @Data annotation
+
+    // Custom constructor is unnecessary
 }

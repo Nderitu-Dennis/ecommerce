@@ -1,9 +1,9 @@
 package com.nderitu.ecommerce.dto;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Lob;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.math.BigDecimal;
 
 @Data
 
@@ -13,7 +13,7 @@ public class ProductDto {
 
     private String name;
 
-    private Long price;
+    private BigDecimal price;
 
     private String description;
 

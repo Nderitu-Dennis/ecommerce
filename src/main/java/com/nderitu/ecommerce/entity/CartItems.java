@@ -5,21 +5,18 @@ import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import java.lang.constant.ConstantDesc;
-
 @Entity
+@Table(name="cart_items") // Change table name to match PostgreSQL conventions
 @Data
-
-
-public class CartItems  {
+public class CartItems {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long price;
+    private Integer price; // Change data type to Integer for better compatibility with PostgreSQL
 
-    private Long quantity;
+    private Integer quantity; // Change data type to Integer for better compatibility with PostgreSQL
 
     @ManyToOne(fetch = FetchType.LAZY, optional=false)
     @JoinColumn(name="product_id", nullable = false)
