@@ -5,6 +5,8 @@ import lombok.Data;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name="cart_items") // Change table name to match PostgreSQL conventions
 @Data
@@ -14,7 +16,8 @@ public class CartItems {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer price; // Change data type to Integer for better compatibility with PostgreSQL
+   // private Integer price; // Change data type to Integer for better compatibility with PostgreSQL
+    private BigDecimal price;
 
     private Integer quantity; // Change data type to Integer for better compatibility with PostgreSQL
 
