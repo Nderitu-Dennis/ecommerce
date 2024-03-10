@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admin/categories")
 @RequiredArgsConstructor
 
 public class AdminCategoryController {
@@ -23,8 +23,8 @@ public class AdminCategoryController {
 
 //    writing the API
 
-    @PostMapping("category")
-    public ResponseEntity<Category> createCategory(@RequestBody CategoryDto categoryDto){
+    @PostMapping("/categories")
+    public ResponseEntity<Category> createcategory(@RequestBody CategoryDto categoryDto){
         Category category = categoryService.createcategory(categoryDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(category);

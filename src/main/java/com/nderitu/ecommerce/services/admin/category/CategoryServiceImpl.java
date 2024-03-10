@@ -21,7 +21,7 @@ public class CategoryServiceImpl implements CategoryService {
         category.setName(categoryDto.getName());
         category.setDescription(categoryDto.getDescription());
 
-        return categoryRepository.  save(category);
+        return categoryRepository.save(category);
     }
 
 //    API to get all the categories

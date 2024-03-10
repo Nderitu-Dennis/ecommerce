@@ -3,6 +3,7 @@ package com.nderitu.ecommerce.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -15,8 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 
 
 
@@ -48,15 +48,28 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String extractUsername(String token) {
+/*    public String extractUsername(String token) {
         try {
             return extractClaim(token, Claims::getSubject);
         } catch (Exception e) {
-           // logger.log(Level.parse("Error extracting username from token: {}"), e.getMessage());
+            // logger.log(Level.parse("Error extracting username from token: {}"), e.getMessage());
+            logger.error("Error extracting username from token: {}", e.getMessage());
+            return null;
+        }
+    }*/
+
+    public String extractUsername(String token) {
+        try {
+            return extractClaim(token, Claims::getSubject);
+        } catch (MalformedJwtException mje) {
+            logger.error("Malformed JWT token: {}", mje.getMessage());
+            return null;
+        } catch (Exception e) {
             logger.error("Error extracting username from token: {}", e.getMessage());
             return null;
         }
     }
+
 
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);

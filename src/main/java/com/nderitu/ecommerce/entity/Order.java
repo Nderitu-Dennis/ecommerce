@@ -1,5 +1,6 @@
 package com.nderitu.ecommerce.entity;
 
+import com.nderitu.ecommerce.dto.OrderDto;
 import com.nderitu.ecommerce.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -27,10 +28,34 @@ public class Order {
     private BigDecimal discount; // Changed from Long to BigDecimal
     private UUID trackingId;
 
-    @OneToOne(cascade = CascadeType.PERSIST)
+    @OneToOne(cascade = CascadeType.MERGE) //todo research on CascadeType.MERGE)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
+    @OneToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "coupon_id", referencedColumnName = "id")
+    private Coupon coupon;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "order")
     private List<CartItems> cartItems;
+
+    public OrderDto getOrderDto(){
+        OrderDto  orderDto= new OrderDto();
+
+        orderDto.setId(id);
+        orderDto.setOrderDescription(orderDescription);
+        orderDto.setAddress(address);
+        orderDto.setTrackingId(trackingId);
+        orderDto.setAmount(amount);
+        orderDto.setDate(date);
+        orderDto.setOrderStatus(orderStatus);
+        orderDto.setUserName(user.getName());
+
+        if(coupon != null){
+            orderDto.setCouponName(coupon.getName());
+        }
+        return orderDto;
+
+
+    }
 }
