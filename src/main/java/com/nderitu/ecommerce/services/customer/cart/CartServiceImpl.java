@@ -18,6 +18,7 @@ import java.math.RoundingMode;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static java.math.RoundingMode.HALF_UP;
@@ -90,44 +91,49 @@ public class CartServiceImpl implements CartService {
 
         orderDto.setCartItems(cartItemsDtoList);
 
-        if(activeOrder.getCoupon() !=null){
+        if (activeOrder.getCoupon() != null) {
             orderDto.setCouponName(activeOrder.getCoupon().getName());
         }
 
         return orderDto;
     }
 
-    public OrderDto applyCoupon(Long userId, String code){
+    public OrderDto applyCoupon(Long userId, String code) {
         Order activeOrder = orderRepository.findByUserIdAndOrderStatus(userId, OrderStatus.Pending);
-        Coupon coupon = couponRepository.findByCode(code).orElseThrow(()-> new ValidationException("Coupon not found"));
+        Coupon coupon = couponRepository.findByCode(code).orElseThrow(() -> new ValidationException("Coupon not found"));
 
-        if(couponIsExpired(coupon)){
+        if (couponIsExpired(coupon)) {
             throw new ValidationException("Coupon has expired!");
         }
 
-        BigDecimal discountAmount = coupon.getDiscount().divide(BigDecimal.valueOf(100.0), RoundingMode.HALF_UP);
-        BigDecimal  netAmount = activeOrder.getTotalAmount().subtract(activeOrder.getTotalAmount().multiply(discountAmount));  //todo accordance to bigdecimal
+        // Calculate the discount amount
+       // BigDecimal discountAmount = activeOrder.getCoupon().getDiscount().divide(BigDecimal.valueOf(100.0), RoundingMode.HALF_UP).multiply(activeOrder.getTotalAmount());
 
-        activeOrder.setAmount(BigDecimal.valueOf((long)netAmount));
-        activeOrder.setDiscount(BigDecimal.valueOf((long)discountAmount));//todo
+      BigDecimal discountAmount = coupon.getDiscount().divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP).multiply(activeOrder.getTotalAmount());// Calculate the net amount todo check this for errors in front end
+        BigDecimal netAmount = activeOrder.getTotalAmount().subtract(discountAmount);
+
+// Update the order with the calculated net amount and discount
+        activeOrder.setAmount(netAmount);
+        activeOrder.setDiscount(discountAmount);
         activeOrder.setCoupon(coupon);
 
         orderRepository.save(activeOrder);
         return activeOrder.getOrderDto();
     }
 
-    private boolean couponIsExpired(Coupon coupon){
+    private boolean couponIsExpired(Coupon coupon) {
         Date currentdate = new Date();
         Date expirationDate = coupon.getExpirationDate();
 
-        return expirationDate != null &&  currentdate.after(expirationDate);
+        return expirationDate != null && currentdate.after(expirationDate);
     }
 
-    public OrderDto increaseProductQuantity (AddProductInCartDto addProductInCartDto) {
+    public OrderDto increaseProductQuantity(AddProductInCartDto addProductInCartDto) {
 
         Order activeOrder = orderRepository.findByUserIdAndOrderStatus(addProductInCartDto.getUserId(), OrderStatus.Pending);
         Optional<Product> optionalProduct = productRepository.findById(addProductInCartDto.getProductId());
 
+//        getting the cart item
         Optional<CartItems> optionalCartItem = cartItemsRepository.findByProductIdAndOrderIdAndUserId(
                 addProductInCartDto.getProductId(), activeOrder.getId(), addProductInCartDto.getUserId()
         );
@@ -136,31 +142,33 @@ public class CartServiceImpl implements CartService {
             CartItems cartItem = optionalCartItem.get();
             Product product = optionalProduct.get();
 
-            //update the details  -amount & quantity
+            //update the details  -amount & total amount
             activeOrder.setAmount(activeOrder.getAmount().add(product.getPrice()));
             activeOrder.setTotalAmount(activeOrder.getTotalAmount().add(product.getPrice()));
 
+//            updating cart quantity
             cartItem.setQuantity(cartItem.getQuantity() + 1);
 
-            if (activeOrder.getCoupon() != null) {
-                BigDecimal discountAmount = coupon.getDiscount().divide(BigDecimal.valueOf(100.0), RoundingMode.HALF_UP);
-                BigDecimal netAmount = activeOrder.getTotalAmount().subtract(activeOrder.getTotalAmount().multiply(discountAmount));  //todo accordance to bigdecimal
 
-                activeOrder.setAmount(BigDecimal.valueOf((long) netAmount));
-                activeOrder.setDiscount(BigDecimal.valueOf((long) discountAmount));//todo
+//            checking if we have coupon in the order or not
+            if (activeOrder.getCoupon() != null) {
+                BigDecimal discountAmount = activeOrder.getCoupon().getDiscount().divide(BigDecimal.valueOf(100.0), RoundingMode.HALF_UP).multiply(activeOrder.getTotalAmount());
+//double discountAmount=((activeOrder.getCoupon().getDiscount()/ 100.0)*activeOrder.getTotalAmount());todo
+                BigDecimal netAmount = activeOrder.getTotalAmount().subtract(discountAmount);
+
+                activeOrder.setAmount(netAmount);
+                activeOrder.setDiscount(discountAmount);
             }
 
+            // if there's no coupon
+            cartItemsRepository.save(cartItem);
+            orderRepository.save(activeOrder);
 
-        // if there's no coupon
-        cartItemsRepository.save(cartItem);
-        orderRepository.save(activeOrder);
-
-        return activeOrder.getOrderDto();
+            return activeOrder.getOrderDto();
+        }
+        return null;  //rep BAD_REQUEST if product is not present
     }
-        return null;  //rep BAD_REQUEST
-    }
-
-    public OrderDto decreaseProductQuantity (AddProductInCartDto addProductInCartDto) {
+    public OrderDto decreaseProductQuantity(AddProductInCartDto addProductInCartDto) {
 
         Order activeOrder = orderRepository.findByUserIdAndOrderStatus(addProductInCartDto.getUserId(), OrderStatus.Pending);
         Optional<Product> optionalProduct = productRepository.findById(addProductInCartDto.getProductId());
@@ -173,18 +181,20 @@ public class CartServiceImpl implements CartService {
             CartItems cartItem = optionalCartItem.get();
             Product product = optionalProduct.get();
 
-            //update the details  -amount & quantity
+            //update the details  -amount & total amount
             activeOrder.setAmount(activeOrder.getAmount().subtract(product.getPrice()));
             activeOrder.setTotalAmount(activeOrder.getTotalAmount().subtract(product.getPrice()));
 
-            cartItem.setQuantity(cartItem.getQuantity() - 1);
+            cartItem.setQuantity(cartItem.getQuantity() - 1);  //decreasing quantity on cart
 
             if (activeOrder.getCoupon() != null) {
-                BigDecimal discountAmount = coupon.getDiscount().divide(BigDecimal.valueOf(100.0), RoundingMode.HALF_UP);
-                BigDecimal netAmount = activeOrder.getTotalAmount().subtract(activeOrder.getTotalAmount().multiply(discountAmount));  //todo accordance to bigdecimal
+                BigDecimal discountAmount = activeOrder.getCoupon().getDiscount().divide(BigDecimal.valueOf(100.0), RoundingMode.HALF_UP).multiply(activeOrder.getTotalAmount());
 
-                activeOrder.setAmount(BigDecimal.valueOf((long) netAmount));
-                activeOrder.setDiscount(BigDecimal.valueOf((long) discountAmount));//todo
+                // double discountAmount=((activeOrder.getCoupon().getDiscount()/100.0)*activeOrder.getTotalAmount());todo
+                BigDecimal netAmount = activeOrder.getTotalAmount().subtract(discountAmount);
+
+                activeOrder.setAmount( netAmount);
+                activeOrder.setDiscount(discountAmount);
             }
 
 
@@ -197,21 +207,57 @@ public class CartServiceImpl implements CartService {
         return null;  //rep BAD_REQUEST
     }
 
-//    placing the order
-    public OrderDto placeOrder(PlaceOrderDto placeOrderDto){
+    //    placing the order
+    public OrderDto placeOrder(PlaceOrderDto placeOrderDto) {
 //        getting the active order of the user
         Order activeOrder = orderRepository.findByUserIdAndOrderStatus(placeOrderDto.getUserId(), OrderStatus.Pending);
+//getting the user
+        Optional<User> optionalUser = userRepository.findById(placeOrderDto.getUserId());
+        if (optionalUser.isPresent()) {
+//            if user is present then we'll update details in the active order
+            activeOrder.setOrderDescription(placeOrderDto.getOrderDescription());
+            activeOrder.setAddress(placeOrderDto.getAddress());
+            activeOrder.setDate(new Date());
+            activeOrder.setOrderStatus(OrderStatus.Placed);
+            activeOrder.setTrackingId(UUID.randomUUID());
 
+            orderRepository.save(activeOrder);
 
+            Order order = new Order();
+            order.setAmount(BigDecimal.ZERO);
+            order.setTotalAmount(BigDecimal.ZERO);
+            order.setDiscount(BigDecimal.ZERO);
+            order.setUser(optionalUser.get());
+            order.setOrderStatus(OrderStatus.Pending);
+            orderRepository.save(order);
+
+            return activeOrder.getOrderDto(); //converts the active order into the Dto
+        }
+        return null;
+
+    }
+//    API to get orders for customers
+    public List<OrderDto> getMyPlacedOrders(Long userId){
+
+        return orderRepository.findByUserIdAndOrderStatusIn(userId,
+                List.of(OrderStatus.Placed,OrderStatus.Shipped,
+                        OrderStatus.Delivered)).stream().map(Order::getOrderDto).collect(Collectors.toList());
 
     }
 
-
-
-
-
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

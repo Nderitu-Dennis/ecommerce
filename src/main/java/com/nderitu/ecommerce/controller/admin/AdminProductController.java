@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/product")
+@RequestMapping("/api/admin")
 @RequiredArgsConstructor
 
 public class AdminProductController {
@@ -30,6 +30,8 @@ public class AdminProductController {
         return ResponseEntity.status(HttpStatus.CREATED).body(productDto1);
 
 //        add product API is complete
+
+
     }
 //getting all products
     @GetMapping("/products")

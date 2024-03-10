@@ -40,9 +40,6 @@ public class AuthServiceImpl implements AuthService{
         User createdUser = userRepository.save(user); //save the new user into the DB
 
         Order order =new Order();
-       /* order.setAmount(0L);
-        order.setTotalAmount(0L);
-        order.setDiscount(0L);*/
         order.setAmount(BigDecimal.ZERO);
         order.setTotalAmount(BigDecimal.ZERO);
         order.setDiscount(BigDecimal.ZERO);
@@ -76,14 +73,4 @@ public class AuthServiceImpl implements AuthService{
             userRepository.save(user); //save the admin
         }
     }
-
-
-
-
-
-
-
-
-
-
 }
