@@ -1,8 +1,10 @@
 package com.nderitu.ecommerce.controller.admin;
 
 
+import com.nderitu.ecommerce.dto.FAQDto;
 import com.nderitu.ecommerce.dto.ProductDto;
 import com.nderitu.ecommerce.services.admin.adminproduct.AdminProductService;
+import com.nderitu.ecommerce.services.admin.faq.FAQService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import java.util.List;
 public class AdminProductController {
 
     private final AdminProductService adminProductService;
+    private final FAQService faqService; //injecting FAQService
 
 //    code for the endpoint
     @PostMapping("/product")
@@ -55,5 +58,12 @@ public class AdminProductController {
         }
         return ResponseEntity.notFound().build();
     }
+
+//    endpoint for post FAQ
+    @PostMapping("/faq/{productId}")
+    public ResponseEntity<FAQDto> postFAQ (@PathVariable Long productId, @RequestBody FAQDto faqDto){
+        return ResponseEntity.status(HttpStatus.CREATED).body(faqService.postFAQ(productId,faqDto));
+    }
+
 
 }
