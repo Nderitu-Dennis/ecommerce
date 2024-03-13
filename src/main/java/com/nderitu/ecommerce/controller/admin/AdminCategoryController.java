@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/categories")
+@RequestMapping("/api/admin")
 @RequiredArgsConstructor
 
 public class AdminCategoryController {
@@ -31,7 +31,7 @@ public class AdminCategoryController {
 
     }
 
-    @GetMapping("")
+    @GetMapping("/categories")
     public ResponseEntity<List<Category>> getAllCategories(){
         return ResponseEntity.ok(categoryService.getAllCategories());
     }

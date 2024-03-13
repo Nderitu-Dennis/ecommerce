@@ -82,6 +82,8 @@ public class Product {
     @Lob
     private byte[] img;
 
+
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
@@ -95,7 +97,7 @@ public class Product {
         productDto.setPrice(price);
         productDto.setDescription(description);
         productDto.setByteImg(img);
-      //  productDto.setCategoryId(new BigDecimal(category.getId()));
+       // productDto.setCategoryId(new BigDecimal(category.getId()));
         productDto.setCategoryId(category.getId());
         productDto.setCategoryName(category.getName());
 

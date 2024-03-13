@@ -20,7 +20,7 @@ public class Category {
 
   @Lob
   @Column(columnDefinition = "TEXT")
- private String description;
+    private String description;
 
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<Product> products = new ArrayList<>();
