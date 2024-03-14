@@ -97,7 +97,6 @@ public class Product {
         productDto.setPrice(price);
         productDto.setDescription(description);
         productDto.setByteImg(img);
-       // productDto.setCategoryId(new BigDecimal(category.getId()));
         productDto.setCategoryId(category.getId());
         productDto.setCategoryName(category.getName());
 

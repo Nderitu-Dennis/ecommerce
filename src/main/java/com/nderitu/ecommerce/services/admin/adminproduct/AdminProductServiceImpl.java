@@ -6,11 +6,13 @@ import com.nderitu.ecommerce.entity.Product;
 import com.nderitu.ecommerce.repository.CategoryRepository;
 import com.nderitu.ecommerce.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,27 +20,23 @@ import java.util.stream.Collectors;
 public class AdminProductServiceImpl implements AdminProductService {
 
     private final ProductRepository productRepository;
-
     private final CategoryRepository categoryRepository;
+    //    add product method
 
-//    add product method
+    public ProductDto addProduct(ProductDto productDto) throws IOException {
 
-  public ProductDto addProduct(ProductDto productDto) throws IOException {
         Product product = new Product();
 
         product.setName(productDto.getName());
         product.setDescription(productDto.getDescription());
         product.setPrice(productDto.getPrice());
-       product.setImg(productDto.getImg().getBytes());  //exception added to the method signature to use this getBytes
+        product.setImg(productDto.getImg().getBytes());
 
-        Category category = categoryRepository.findById(productDto.getCategoryId()).orElseThrow();  //todo meaning of this line
+        Category category = categoryRepository.findById(productDto.getCategoryId()).orElseThrow();
 
-        product.setCategory(category);  //set the category in the product
-
+        product.setCategory(category);
         return productRepository.save(product).getDto();
     }
-
-
 
 //    method for getting all products
 
@@ -72,11 +70,16 @@ public class AdminProductServiceImpl implements AdminProductService {
     }
 
     //    method to update product details
+
     public ProductDto updateProduct(Long productId, ProductDto productDto) throws IOException {
+        Logger logger = (Logger) LoggerFactory.getLogger(this.getClass());
+
         Optional<Product> optionalProduct = productRepository.findById(productId);
         Optional<Category> optionalCategory = categoryRepository.findById(productDto.getCategoryId());
 
-    /*    if (optionalProduct.isPresent() && optionalCategory.isPresent()) {
+        if (optionalProduct.isPresent() && optionalCategory.isPresent()) {
+            logger.info("Found product with ID: {} and category with ID: {}");
+
             Product product = optionalProduct.get();
 
             product.setName(productDto.getName());
@@ -84,15 +87,23 @@ public class AdminProductServiceImpl implements AdminProductService {
             product.setDescription(productDto.getDescription());
             product.setCategory(optionalCategory.get());
 
-           if (productDto.getImg() != null) {
+            if (productDto.getImg() != null) {
+                logger.info("Updating image for product with ID: {}");
                 product.setImg(productDto.getImg().getBytes());
-            }
-            return productRepository.save(product).getDto();
+            } else {
+                logger.info("No image provided for product with ID: {}");
+                System.out.flush();
 
+            }
+
+            Product savedProduct = productRepository.save(product);
+            logger.info("Product with ID: {} updated successfully");
+            return savedProduct.getDto();
         } else {
+            logger.warning("Product with ID: {} or category with ID: {} not found");
+            System.out.flush();
             return null;
-        }*/
-        return productDto;
+        }
     }
 
 }
