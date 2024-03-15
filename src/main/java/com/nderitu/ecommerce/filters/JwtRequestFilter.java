@@ -19,11 +19,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
+
  //a constructor is generated for all final fields as well as non initialized fields
 public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final UserDetailsServiceImpl userDetailsService;
-
     private final JwtUtil jwtUtil;
 
     public JwtRequestFilter(UserDetailsServiceImpl userDetailsService, JwtUtil jwtUtil) {

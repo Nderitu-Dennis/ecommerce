@@ -76,7 +76,8 @@ public class Product {
 
     private BigDecimal price;
 
-    @Lob
+  // @Lob
+  @Column(columnDefinition = "TEXT")
     private String description;
 
     @Lob
@@ -87,7 +88,7 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "category_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
+    @JsonIgnore  //field should be excluded from the resulting JSON output
     private Category category;
 
     public ProductDto getDto() {

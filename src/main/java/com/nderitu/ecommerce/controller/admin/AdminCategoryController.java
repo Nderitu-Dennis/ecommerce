@@ -22,7 +22,7 @@ public class AdminCategoryController {
     private final CategoryService categoryService;
 
 //    writing the API
-
+// yoo
     @PostMapping("/categories")
     public ResponseEntity<Category> createcategory(@RequestBody CategoryDto categoryDto){
         Category category = categoryService.createcategory(categoryDto);

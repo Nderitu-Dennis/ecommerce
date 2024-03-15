@@ -1,4 +1,3 @@
-
 package com.nderitu.ecommerce.utils;
 
 import io.jsonwebtoken.Claims;
@@ -12,20 +11,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.security.SignatureException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-
-
-
 @Component
 public class JwtUtil {
     //private static final Logger logger = (Logger) LoggerFactory.getLogger(JwtUtil.class);
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(JwtUtil.class);
-
-
+    // private static final org.slf4j.Logger logger = LoggerFactory.getLogger(JwtUtil.class);
     public static final String SECRET = "3E77BC219ECD2CF64F76931EE12A57A104720961636BBD061FE576F417FA46F7";
 
     public String generateToken(String userName) {
@@ -39,45 +34,38 @@ public class JwtUtil {
                 .setSubject(userName)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30)) // 30 minutes
-                .signWith(getSignKey(), SignatureAlgorithm.HS256)
-                .compact();
+                .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
+
     }
 
     private Key getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET);
-        return Keys.hmacShaKeyFor(keyBytes);
+        byte[] keybytes = Decoders.BASE64.decode(SECRET);
+        return Keys.hmacShaKeyFor(keybytes);
     }
-
-/*    public String extractUsername(String token) {
-        try {
-            return extractClaim(token, Claims::getSubject);
-        } catch (Exception e) {
-            // logger.log(Level.parse("Error extracting username from token: {}"), e.getMessage());
-            logger.error("Error extracting username from token: {}", e.getMessage());
-            return null;
-        }
-    }*/
 
     public String extractUsername(String token) {
-        try {
-            return extractClaim(token, Claims::getSubject);
-        } catch (MalformedJwtException mje) {
-            logger.error("Malformed JWT token: {}", mje.getMessage());
-            return null;
-        } catch (Exception e) {
-            logger.error("Error extracting username from token: {}", e.getMessage());
-            return null;
-        }
+        return extractClaim(token, Claims::getSubject);
+
     }
 
-
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
+        final Claims claims = extractAllClaims("e" + token);
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token) {
+   /* private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token).getBody();
+    }*/
+
+    private Claims extractAllClaims(String token) {
+        try {
+            return Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token).getBody();
+        } catch (MalformedJwtException e) {
+            // Log the error and the token for further investigation
+            System.err.println("Malformed JWT token: " + token);
+            e.printStackTrace();
+            throw e; // Rethrow the exception to indicate that the token is malformed
+        }
     }
 
     private Boolean isTokenExpired(String token) {
@@ -89,14 +77,9 @@ public class JwtUtil {
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
-        try {
-            final String username = extractUsername(token);
-            return username != null && username.equals(userDetails.getUsername()) && !isTokenExpired(token);
-        } catch (Exception e) {
-//            logger.log(Level.parse("Error validating token: {}"), e.getMessage());
-            logger.error("Error validating token: {}", e.getMessage());
-            return false;
-        }
+
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+
     }
 }
-

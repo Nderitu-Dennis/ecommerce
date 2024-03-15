@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository //interacts with the DB performing CRUD Operations
 public interface UserRepository extends JpaRepository <User, Long>{
 
-    Optional<User> findByEmail(String email);
+    Optional<User> findFirstByEmail(String email);
 
     User findByRole(UserRole userRole);  //this method will return User
 

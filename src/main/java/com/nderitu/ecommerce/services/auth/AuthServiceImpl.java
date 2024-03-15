@@ -21,10 +21,8 @@ public class AuthServiceImpl implements AuthService{
 
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-
     @Autowired
     private OrderRepository orderRepository;
 
@@ -56,7 +54,9 @@ public class AuthServiceImpl implements AuthService{
 
 //check if there is a user with the same email/existing email
     public Boolean hasUserWithEmail(String email){
-        return userRepository.findByEmail(email).isPresent();
+
+        return userRepository.findFirstByEmail(email).isPresent();
+//        checks if we have user with the same email
     }
 
     //creating the admin account

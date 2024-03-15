@@ -18,7 +18,6 @@ public class Category {
 
     private String name;
 
-  @Lob
   @Column(columnDefinition = "TEXT")
     private String description;
 

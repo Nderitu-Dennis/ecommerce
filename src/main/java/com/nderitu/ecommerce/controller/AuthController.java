@@ -40,36 +40,9 @@ public class AuthController {
     private final AuthService authService;
     //login API call
 
-    /*@PostMapping("/authenticate")  //sends data to the server
-    public void createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest, HttpServletResponse response) throws IOException, JSONException {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
-        }
-        //catching the wrong credentials exception
-        catch (BadCredentialsException e) {
-            throw new BadCredentialsException("Wrong username or password");
-        }
-        //user credentials are correct,so lets get the user's details
 
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
-        Optional<User> optionalUser = userRepository.findByEmail(userDetails.getUsername());
 
-        //calling JwtUtil to generate the token
-        final String jwt = jwtUtil.generateToken(userDetails.getUsername());
-
-        if (optionalUser.isPresent()) {
-            //if user is present then add the details in the response
-            response.getWriter().write(new JSONObject()
-                            .put("userId", optionalUser.get().getId())
-                            .put("role", optionalUser.get().getRole())
-                            .toString()
-            );
-            response.addHeader("Access-Control-Expose-Headers","Authorization");
-            response.addHeader("Access-Control-Allow-Headers","Authorization, X-PINGOTHER ,Origin, " +  "X-Requested-With, Content-Type, Accept, X-Custom-header ");
-
-            response.addHeader(HEADER_STRING, TOKEN_PREFIX + jwt);
-        }    }*/
-    @PostMapping("/authenticate")
+   @PostMapping("/authenticate")
     public void createAuthenticationToken(@RequestBody AuthenticationRequest authenticationRequest, HttpServletResponse response) throws IOException, JSONException {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword()));
@@ -79,7 +52,7 @@ public class AuthController {
 
         // User credentials are correct, so let's get the user's details
         final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
-        Optional<User> optionalUser = userRepository.findByEmail(userDetails.getUsername());
+        Optional<User> optionalUser = userRepository.findFirstByEmail(userDetails.getUsername());
 
         // Generate the JWT token only if the user is present
         if (optionalUser.isPresent()) {
@@ -108,6 +81,7 @@ public class AuthController {
 
         if(authService.hasUserWithEmail(signupRequest.getEmail())){
             return new ResponseEntity<>("User already exists", HttpStatus.NOT_ACCEPTABLE);
+//            the user has to choose another email
         }
         UserDto userDto = authService.createUser(signupRequest);
         return new ResponseEntity<>(userDto, HttpStatus.OK);

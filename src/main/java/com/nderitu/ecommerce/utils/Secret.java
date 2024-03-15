@@ -2,8 +2,7 @@ package com.nderitu.ecommerce.utils;
 
 import java.security.SecureRandom;
 
-/*public class Secret {
-    //todo remove main method here
+public class Secret {
     public static void main(String[] args) {
         // Generate a secure random byte array
         SecureRandom random = new SecureRandom();
@@ -20,13 +19,7 @@ import java.security.SecureRandom;
         // Print the generated secret
         System.out.println(secret);
     }
-}*/
 
-
-
-import java.security.SecureRandom;
-
-public class Secret {
     public static String generateSecret() {
         // Generate a secure random byte array
         SecureRandom random = new SecureRandom();
@@ -41,4 +34,5 @@ public class Secret {
         return sb.toString();
     }
 }
+
 
