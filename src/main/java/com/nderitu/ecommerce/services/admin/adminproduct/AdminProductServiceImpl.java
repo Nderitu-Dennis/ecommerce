@@ -72,13 +72,12 @@ public class AdminProductServiceImpl implements AdminProductService {
     //    method to update product details
 
     public ProductDto updateProduct(Long productId, ProductDto productDto) throws IOException {
-        Logger logger = (Logger) LoggerFactory.getLogger(this.getClass());
+       // Logger logger = (Logger) LoggerFactory.getLogger(this.getClass());
 
         Optional<Product> optionalProduct = productRepository.findById(productId);
         Optional<Category> optionalCategory = categoryRepository.findById(productDto.getCategoryId());
 
         if (optionalProduct.isPresent() && optionalCategory.isPresent()) {
-            logger.info("Found product with ID: {} and category with ID: {}");
 
             Product product = optionalProduct.get();
 
@@ -88,25 +87,18 @@ public class AdminProductServiceImpl implements AdminProductService {
             product.setCategory(optionalCategory.get());
 
             if (productDto.getImg() != null) {
-                logger.info("Updating image for product with ID: {}");
                 product.setImg(productDto.getImg().getBytes());
-            } else {
-                logger.info("No image provided for product with ID: {}");
-                System.out.flush();
-
-            }
 
             Product savedProduct = productRepository.save(product);
-            logger.info("Product with ID: {} updated successfully");
             return savedProduct.getDto();
         } else {
-            logger.warning("Product with ID: {} or category with ID: {} not found");
-            System.out.flush();
             return null;
-        }
-    }
+        }}
+        return productDto;
+    }}
 
-}
+
+
 
 
 

@@ -51,6 +51,7 @@ public class AdminProductController {
     }
 
     //endpoint for the delete method
+    @DeleteMapping("/product/{productId}")
     public ResponseEntity<Void> deleteProduct (@PathVariable Long productId){
         boolean deleted = adminProductService.deleteProduct(productId);
         if(deleted){

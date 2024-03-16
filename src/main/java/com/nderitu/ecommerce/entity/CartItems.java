@@ -17,7 +17,6 @@ public class CartItems {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-   // private Integer price; // Change data type to Integer for better compatibility with PostgreSQL
     private BigDecimal price;
 
     private Integer quantity; // Change data type to Integer for better compatibility with PostgreSQL
