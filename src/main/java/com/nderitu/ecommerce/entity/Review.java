@@ -17,7 +17,8 @@ public class Review {
 
     private Long rating;
 
-    @Lob
+
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     @Lob
