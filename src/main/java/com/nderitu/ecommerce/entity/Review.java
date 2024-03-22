@@ -1,5 +1,6 @@
 package com.nderitu.ecommerce.entity;
 
+import com.nderitu.ecommerce.dto.ReviewDto;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.OnDelete;
@@ -42,4 +43,18 @@ public class Review {
     @OnDelete(action=OnDeleteAction.CASCADE)
     private Product product;
 
+    public ReviewDto getDto() {
+        ReviewDto reviewDto=new ReviewDto();
+
+        reviewDto.setId(id);
+        reviewDto.setRating(rating);
+        reviewDto.setDescription(description);
+        reviewDto.setReturnedImg(img);
+        reviewDto.setProductId(product.getId());
+        reviewDto.setUserId(user.getId());
+        reviewDto.setUserName(user.getName());
+
+        return reviewDto;
+
+    }
 }
