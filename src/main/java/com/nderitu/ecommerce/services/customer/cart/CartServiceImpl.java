@@ -21,29 +21,43 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static java.math.RoundingMode.HALF_UP;
 
 @Service
 public class CartServiceImpl implements CartService {
 
     @Autowired
     private OrderRepository orderRepository;
-
     @Autowired
     private UserRepository userRepository;
-
     @Autowired
     private CartItemsRepository cartItemsRepository;
     @Autowired
     private ProductRepository productRepository;
-
     @Autowired
     private CouponRepository couponRepository;
 
     public ResponseEntity<?> addProductToCart(AddProductInCartDto addProductInCartDto) {
+
+
         Order activeOrder = orderRepository.findByUserIdAndOrderStatus(addProductInCartDto.getUserId(), OrderStatus.Pending); //getting the current active order
+
+            // Check if activeOrder is null before proceeding
+            if (activeOrder == null) {
+                // Handle the case when activeOrder is null
+                // For example, create a new order and save it
+                User user = userRepository.findById(addProductInCartDto.getUserId())
+                        .orElseThrow(() -> new RuntimeException("User not found"));
+                activeOrder = new Order();
+                activeOrder.setUser(user);
+                activeOrder.setOrderStatus(OrderStatus.Pending);
+                activeOrder.setAmount(BigDecimal.ZERO);
+                activeOrder.setTotalAmount(BigDecimal.ZERO);
+                activeOrder.setDiscount(BigDecimal.ZERO);
+                activeOrder = orderRepository.save(activeOrder);
+            }
+
         Optional<CartItems> optionalCartItems = cartItemsRepository.findByProductIdAndOrderIdAndUserId
-                (addProductInCartDto.getProductId(), activeOrder.getId(), addProductInCartDto.getUserId());
+                (addProductInCartDto.getProductId(),activeOrder.getId(), addProductInCartDto.getUserId());
 
         if (optionalCartItems.isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
@@ -107,9 +121,9 @@ public class CartServiceImpl implements CartService {
         }
 
         // Calculate the discount amount
-       // BigDecimal discountAmount = activeOrder.getCoupon().getDiscount().divide(BigDecimal.valueOf(100.0), RoundingMode.HALF_UP).multiply(activeOrder.getTotalAmount());
+        // BigDecimal discountAmount = activeOrder.getCoupon().getDiscount().divide(BigDecimal.valueOf(100.0), RoundingMode.HALF_UP).multiply(activeOrder.getTotalAmount());
 
-      BigDecimal discountAmount = coupon.getDiscount().divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP).multiply(activeOrder.getTotalAmount());// Calculate the net amount todo check this for errors in front end
+        BigDecimal discountAmount = coupon.getDiscount().divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP).multiply(activeOrder.getTotalAmount());// Calculate the net amount todo check this for errors in front end
         BigDecimal netAmount = activeOrder.getTotalAmount().subtract(discountAmount);
 
 // Update the order with the calculated net amount and discount
@@ -236,7 +250,7 @@ public class CartServiceImpl implements CartService {
         return null;
 
     }
-//    API to get orders for customers
+    //    API to get orders for customers
     public List<OrderDto> getMyPlacedOrders(Long userId){
 
         return orderRepository.findByUserIdAndOrderStatusIn(userId,

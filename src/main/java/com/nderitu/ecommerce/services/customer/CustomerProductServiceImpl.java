@@ -1,12 +1,16 @@
 package com.nderitu.ecommerce.services.customer;
 
+import com.nderitu.ecommerce.dto.ProductDetailDto;
 import com.nderitu.ecommerce.dto.ProductDto;
 import com.nderitu.ecommerce.entity.Product;
+import com.nderitu.ecommerce.repository.FAQRepository;
 import com.nderitu.ecommerce.repository.ProductRepository;
+import com.nderitu.ecommerce.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,6 +20,9 @@ import java.util.stream.Collectors;
 public class CustomerProductServiceImpl implements CustomerProductService {
 
     private final ProductRepository productRepository;
+    private final FAQRepository faqRepository;
+    private final ReviewRepository reviewRepository;
+
 
     public List<ProductDto> getAllProducts(){
         List<Product> products = productRepository.findAll();
@@ -28,5 +35,15 @@ public class CustomerProductServiceImpl implements CustomerProductService {
         List<Product> products = productRepository.findAllByNameContaining(name);
         return products.stream().map(Product::getDto).collect(Collectors.toList());
 
+    }
+
+    public ProductDetailDto getProductDetailById(Long productId) {
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+        if (optionalProduct.isPresent()) {
+
+
+        }
+
+        return null;
     }
 }
