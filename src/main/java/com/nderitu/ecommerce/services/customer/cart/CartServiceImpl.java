@@ -38,7 +38,6 @@ public class CartServiceImpl implements CartService {
 
     public ResponseEntity<?> addProductToCart(AddProductInCartDto addProductInCartDto) {
 
-
         Order activeOrder = orderRepository.findByUserIdAndOrderStatus(addProductInCartDto.getUserId(), OrderStatus.Pending); //getting the current active order
 
             // Check if activeOrder is null before proceeding
@@ -60,7 +59,7 @@ public class CartServiceImpl implements CartService {
                 (addProductInCartDto.getProductId(),activeOrder.getId(), addProductInCartDto.getUserId());
 
         if (optionalCartItems.isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null); //error 4009
         } else {
             Optional<Product> optionalProduct = productRepository.findById(addProductInCartDto.getProductId());
             Optional<User> optionalUser = userRepository.findById(addProductInCartDto.getUserId());
