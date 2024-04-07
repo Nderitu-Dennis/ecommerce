@@ -47,9 +47,5 @@ public class CartItems {
         cartItemsDto.setReturnedImg(product.getImg());
 
         return cartItemsDto;
-
-
-
-
     }
 }
