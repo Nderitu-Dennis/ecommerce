@@ -28,7 +28,7 @@ public class WebSecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        /*security filter chain is a series pf filters that intercept incoming HTTP requests and
+        /*security filter chain is a series of filters that intercept incoming HTTP requests and
         * outgoing responses to enforce security measures.Ensures that only authorized users can
         * access protected resources */
         //todo configure with spring 3.0.0

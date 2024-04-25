@@ -35,7 +35,6 @@ public class JwtUtil {
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 200))  //200 mins
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
-
     }
 
     private Key getSignKey() {
@@ -52,8 +51,6 @@ public class JwtUtil {
         final Claims claims = extractAllClaims("e" + token);  //todo
         return claimsResolver.apply(claims);
     }
-
-
 
     private Claims extractAllClaims(String token) {
         try {

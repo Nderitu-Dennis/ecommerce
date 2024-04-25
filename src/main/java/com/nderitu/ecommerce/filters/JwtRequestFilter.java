@@ -43,6 +43,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer")) {
             token = authHeader.substring(7);
             username = jwtUtil.extractUsername(token);
+/*extracting JWT token
+* if a token is present and starts with bearer ,the username is extracted*/
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
