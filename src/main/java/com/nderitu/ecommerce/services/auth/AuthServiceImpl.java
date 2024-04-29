@@ -70,7 +70,7 @@ public class AuthServiceImpl implements AuthService{
             user.setName("admin");
             user.setRole(UserRole.ADMIN);
             user.setPassword(new BCryptPasswordEncoder().encode("admin"));
-            userRepository.save(user); //save the admin in the database
+            userRepository.save(user); //save the admin
         }
     }
 }
