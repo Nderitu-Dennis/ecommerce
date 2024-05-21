@@ -20,12 +20,10 @@ import java.util.function.Function;
 public class JwtUtil {
     //private static final Logger logger = (Logger) LoggerFactory.getLogger(JwtUtil.class);
     // private static final org.slf4j.Logger logger = LoggerFactory.getLogger(JwtUtil.class);
-    public static final String SECRET = "3E77BC219ECD2CF64F76931EE12A57A104720961636BBD061FE576F417FA46F7";
-
-    public String generateToken(String userName) {
+    public static final String SECRET = "3E77BC219ECD2CF64F76931EE12A57A104720961636BBD061FE576F417FA46F7";    public String generateToken(String userName) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(claims, userName);
-    }
+    } //This method builds the JWT with claims, subject, issued date, expiration date, and signs it with the secret key.
 
     private String createToken(Map<String, Object> claims, String userName) {
         return Jwts.builder()
@@ -39,21 +37,30 @@ public class JwtUtil {
     private Key getSignKey() {
         byte[] keybytes = Decoders.BASE64.decode(SECRET);
         return Keys.hmacShaKeyFor(keybytes);
-    }
+    } //This method decodes the base64 encoded secret and returns a Key object used for signing the JWT.
 
+
+    //extracting claims
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+        //Extracts the username (subject) from the JWT.
 
     }
 
+//    Claims: Used to store information in the JWT payload
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims("e" + token);  //todo
+        final Claims claims = extractAllClaims("e" + token);  //todo-its working i'll not touch it!
         return claimsResolver.apply(claims);
+        // A generic method to extract any claim from the JWT by applying the given function.
     }
 
     private Claims extractAllClaims(String token) {
+//         Parses the JWT and retrieves all claims. If the token is malformed, it logs the error and rethrows the exception.
         try {
-            return Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token).getBody();
+            return Jwts.parserBuilder()
+                    .setSigningKey(getSignKey())
+                    .build().parseClaimsJws(token)
+                    .getBody();
         } catch (MalformedJwtException e) {
             // Log the error and the token for further investigation
             System.err.println("Malformed JWT token: " + token);
@@ -62,6 +69,7 @@ public class JwtUtil {
         }
     }
 
+//    checking token expiration
     private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
@@ -70,6 +78,7 @@ public class JwtUtil {
         return extractClaim(token, Claims::getExpiration);
     }
 
+//    validating the token
     public Boolean validateToken(String token, UserDetails userDetails) {
 
         final String username = extractUsername(token);

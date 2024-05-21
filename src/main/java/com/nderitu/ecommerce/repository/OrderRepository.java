@@ -13,7 +13,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     //return type will be order
 
     Order findByUserIdAndOrderStatus(Long userId, OrderStatus orderStatus);
-
+//These are method signatures that define queries, but the actual implementation of
+// these queries would typically reside within the service layer.
     List<Order> findAllByOrderStatusIn(List<OrderStatus> orderStatusList);
 
     List<Order> findByUserIdAndOrderStatusIn(Long userId, List<OrderStatus> orderStatus);

@@ -8,7 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface CouponRepository extends JpaRepository<Coupon, Long> {
-    //method to check if coupon exists by the code
+    //method signature to check if coupon exists by the code
 
     boolean existsByCode(String code);
 
